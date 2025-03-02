@@ -1,19 +1,22 @@
-# Custom Laravel Nova 4 map detail field
+# NovaFieldMap
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/gabrielesbaiz/nova-field-map.svg?style=flat-square)](https://packagist.org/packages/gabrielesbaiz/nova-field-map)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/gabrielesbaiz/nova-field-map/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/gabrielesbaiz/nova-field-map/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/gabrielesbaiz/nova-field-map/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/gabrielesbaiz/nova-field-map/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/gabrielesbaiz/nova-field-map.svg?style=flat-square)](https://packagist.org/packages/gabrielesbaiz/nova-field-map)
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+Custom Laravel Nova 4 map detail field.
 
-## Support us
+Original code from [iMuMz/NovaFieldMap](https://github.com/iMuMz/NovaFieldMap)
 
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/nova-field-map.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/nova-field-map)
+## Features
 
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+- ✅ Support [Leaflet](https://leafletjs.com/)
+- ✅ Support Google Maps
+- ✅ Marker clustering
+- ✅ Map height
+- ✅ Latitude and longitude coordinates
+- ✅ GeoJSON
+- ✅ Marker popup
+- ✅ Custom marker icons
 
 ## Installation
 
@@ -23,43 +26,77 @@ You can install the package via composer:
 composer require gabrielesbaiz/nova-field-map
 ```
 
-You can publish and run the migrations with:
-
-```bash
-php artisan vendor:publish --tag="nova-field-map-migrations"
-php artisan migrate
-```
-
-You can publish the config file with:
-
-```bash
-php artisan vendor:publish --tag="nova-field-map-config"
-```
-
-This is the contents of the published config file:
-
-```php
-return [
-];
-```
-
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="nova-field-map-views"
-```
-
 ## Usage
 
 ```php
-$novaFieldMap = new Gabrielesbaiz\NovaFieldMap();
-echo $novaFieldMap->echoPhrase('Hello, Gabrielesbaiz!');
+use Gabrielesbaiz\NovaFieldMap;
+
+
+NovaFieldMap::make()
 ```
 
-## Testing
+### Available Methods
 
-```bash
-composer test
+#### Height
+```
+NovaFieldMap::make()
+->height('400px') // default is 300px
+```
+#### Google Maps
+By default the provider is OpenStreetMaps.<br> 
+You must set your Google Maps API key (https://developers.google.com/maps/documentation/javascript/get-api-key).
+```
+NovaFieldMap::make()
+->googleApiKey('')
+->googleMapType('roadmap'), // roadmap, satellite or hybrid
+```
+#### Latitude / Longitude (Point)
+```
+NovaFieldMap::make('')
+->type('LatLon')
+->point($this->my_latitude,$this->my_longitude)
+```
+#### GeoJSON
+```
+NovaFieldMap::make()
+->type('GeoJson')
+->geoJson('')
+```
+#### GeoJson Example 
+```
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "popup": "I am a Popup"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          23.8623046875,
+          -30.221101852485987
+        ]
+      }
+    }
+  ]
+}
+```
+
+#### Popup
+```
+NovaFieldMap::make()
+->popup('popup')
+```
+#### Custom Marker Icon
+```
+NovaFieldMap::make()
+->markerIcon('/images/marker-icon.png')
+```
+You can pass additional parameters to set the icon size and anchor
+```
+->markerIcon('/images/marker-icon.png',[100,100],[50,50])
 ```
 
 ## Changelog
@@ -76,6 +113,7 @@ Please review [our security policy](../../security/policy) on how to report secu
 
 ## Credits
 
+- [Chad Copeland](https://github.com/iMuMz)
 - [Gabriele Sbaiz](https://github.com/gabrielesbaiz)
 - [All Contributors](../../contributors)
 

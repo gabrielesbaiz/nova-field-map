@@ -8,9 +8,3 @@
   * https://github.com/ded/script.js
   * (c) Dustin Diaz 2014 | License MIT
   */
-
-/*!
- * vuex v4.1.0
- * (c) 2022 Evan You
- * @license MIT
- */

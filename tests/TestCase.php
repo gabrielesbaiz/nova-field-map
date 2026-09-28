@@ -1,37 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Gabrielesbaiz\NovaFieldMap\Tests;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
+use Gabrielesbaiz\NovaFieldMap\FieldMapServiceProvider;
+use Gabrielesbaiz\NovaFieldMap\Resolvers\ResolverRegistry;
+use Laravel\Nova\NovaCoreServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Gabrielesbaiz\NovaFieldMap\NovaFieldMapServiceProvider;
 
-class TestCase extends Orchestra
+abstract class TestCase extends Orchestra
 {
     protected function setUp(): void
     {
         parent::setUp();
 
-        Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Gabrielesbaiz\\NovaFieldMap\\Database\\Factories\\'.class_basename($modelName).'Factory'
-        );
+        // The registry is static, so a resolver registered by one test would
+        // otherwise leak into every test that follows it.
+        ResolverRegistry::flush();
     }
 
-    protected function getPackageProviders($app)
+    /**
+     * @return array<int, class-string>
+     */
+    protected function getPackageProviders($app): array
     {
         return [
-            NovaFieldMapServiceProvider::class,
+            NovaCoreServiceProvider::class,
+            FieldMapServiceProvider::class,
         ];
     }
 
-    public function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app): void
     {
-        config()->set('database.default', 'testing');
-
-        /*
-         foreach (\Illuminate\Support\Facades\File::allFiles(__DIR__ . '/database/migrations') as $migration) {
-            (include $migration->getRealPath())->up();
-         }
-         */
+        $app['config']->set('app.key', 'base64:'.base64_encode(random_bytes(32)));
+        $app['config']->set('database.default', 'testing');
+        $app['config']->set('cache.default', 'array');
     }
 }

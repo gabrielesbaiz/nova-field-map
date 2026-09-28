@@ -1,31 +1,29 @@
 {
     "private": true,
+    "type": "module",
     "scripts": {
-        "dev": "npm run development",
-        "development": "mix",
-        "watch": "mix watch",
-        "watch-poll": "mix watch -- --watch-options-poll=1000",
-        "hot": "mix watch --hot",
-        "prod": "npm run production",
-        "production": "mix --production",
-        "nova:install": "npm --prefix='../../vendor/laravel/nova' ci"
+        "dev": "vite build --watch --mode development && vite build --config vite.lazy.config.js --watch --mode development",
+        "build": "vite build && vite build --config vite.lazy.config.js",
+        "test": "vitest run",
+        "format": "prettier --write resources/js"
     },
     "devDependencies": {
-        "@vue/compiler-sfc": "^3.2.22",
-        "form-backend-validation": "^2.3.3",
-        "laravel-mix": "^6.0.41",
-        "laravel-nova-devtool": "file:vendor/laravel/nova-devtool",
-        "lodash": "^4.17.21",
-        "postcss": "^8.3.11",
-        "vue-loader": "^16.8.3"
+        "@vitejs/plugin-vue": "5.2.4",
+        "@vue/compiler-sfc": "3.5.17",
+        "@vue/test-utils": "2.4.6",
+        "happy-dom": "15.11.7",
+        "prettier": "3.5.3",
+        "vite": "6.3.5",
+        "vitest": "3.1.4",
+        "vue": "3.5.17"
     },
     "dependencies": {
-        "@inertiajs/inertia": "^0.11.1",
+        "@turf/boolean-point-in-polygon": "^7.2.0",
+        "dompurify": "^3.2.6",
         "leaflet": "^1.9.4",
         "leaflet.gridlayer.googlemutant": "^0.14.1",
         "leaflet.markercluster": "^1.5.3",
-        "scriptjs": "^2.5.9",
-        "vue": "^3.5.13",
-        "vuex": "^4.1.0"
+        "leaflet.heat": "^0.2.0",
+        "@geoman-io/leaflet-geoman-free": "^2.18.3"
     }
 }

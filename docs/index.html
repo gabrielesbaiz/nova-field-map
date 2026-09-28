@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>NovaField Map</title>
+<meta name="description" content="A Leaflet map field for Laravel Nova 5. It reads the coordinate column your model already has, renders it as a map, and lets an administrator drop the pin themselves.">
+<link rel="canonical" href="https://gabrielesbaiz.github.io/nova-field-map/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#128506;</text></svg>">
+<meta property="og:type" content="website">
+<meta property="og:title" content="NovaField Map">
+<meta property="og:description" content="Reads the column you already have. Renders a map. Escapes the popup. A Nova 5 field that resolves its own attribute, loads Leaflet only when a map is on screen.">
+<meta property="og:url" content="https://gabrielesbaiz.github.io/nova-field-map/">
+<meta property="og:site_name" content="NovaField Map">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://gabrielesbaiz.github.io/nova-field-map/art/nova-field-map-logo.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="NovaField Map">
+<meta name="twitter:description" content="Reads the column you already have. Renders a map. Escapes the popup. A Nova 5 field that resolves its own attribute, loads Leaflet only when a map is on screen.">
+<meta name="twitter:image" content="https://gabrielesbaiz.github.io/nova-field-map/art/nova-field-map-logo.png">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#18181b" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap">
+<link rel="stylesheet" href="app.css">
+<script defer src="app.js"></script>
+</head>
+<body>
+<header class="top">
+  <div class="mx in">
+    <a class="brand" href="#/home">NovaField<b> Map</b> <span class="ver">3.0.0</span></a>
+    <nav id="nav">
+      <a href="#/intro">Guide</a>
+      <a href="#/play">Playground</a>
+      <a href="#/api">Reference</a>
+      <a href="#/recipes">Recipes</a>
+      <a href="#/upgrade">Upgrade</a>
+      <a class="sponsor" href="https://github.com/sponsors/gabrielesbaiz">&#9829; Sponsor</a>
+    </nav>
+    <div class="tools">
+      <button class="search" id="openPal" aria-label="Search the documentation" aria-keyshortcuts="Meta+K">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="M10.4 10.4 14 14"/></svg>
+        <span>Search</span><kbd id="kbd">&#8984;K</kbd>
+      </button>
+      <button class="mode" id="mode">Dark</button>
+    </div>
+  </div>
+  <div class="progress" id="progress"></div>
+</header>
+
+<div class="pal" id="pal" hidden>
+  <div class="box" role="dialog" aria-modal="true" aria-label="Search the documentation">
+    <input id="palInput" type="text" placeholder="Jump to&hellip;" autocomplete="off" spellcheck="false">
+    <ul id="palList" role="listbox"></ul>
+  </div>
+</div>
+
+<main>
+
+<!-- ==================== HOME ==================== -->
+<div class="page" id="home">
+  <div class="hero">
+    <div class="mx in">
+      <div class="grid">
+        <div>
+          <img class="logo" src="art/nova-field-map-logo.png"
+               alt="NovaField Map" width="1600" height="533">
+          <p class="eyebrow">Laravel Nova 5 &nbsp;·&nbsp; MIT</p>
+          <h1>A map field that behaves like a Nova field.</h1>
+          <p class="lede">
+            <b>FieldMap</b> reads your coordinate column, works out what shape it is in, and draws it.
+            GeoJSON, <code>"45.6495,13.7768"</code>, a <code>[lat, lng]</code> array or a spatial
+            <code>Point</code> — all understood without being told. Make it editable and an
+            administrator drops the pin themselves.
+          </p>
+          <div class="cta">
+            <a class="btn" href="#/install">Install it</a>
+            <a class="btn ghost" href="#/intro">Read the guide</a>
+          </div>
+          <div class="facts">
+            <div><b class="num">11.2</b><span>kB gz per page</span></div>
+            <div><b class="num">169</b><span>tests passing</span></div>
+            <div><b class="num">10</b><span>tile providers</span></div>
+            <div><b class="num">0</b><span>keys required</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="panel">
+            <div class="head"><b>Warehouse</b><span class="pill">Detail</span></div>
+            <div class="row"><div class="k">Name</div>
+              <div class="v">Trieste Porto Vecchio</div></div>
+            <div class="row"><div class="k">Location</div>
+              <div class="v">
+                <div class="mapbox" id="heroMap">
+                  <div class="skel" id="heroSkel"></div>
+                  <svg viewBox="0 0 400 210" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                    <rect width="400" height="210" fill="color-mix(in srgb,var(--accent) 5%,var(--wash))"/>
+                    <path d="M0 158 C 60 148 100 170 150 156 S 250 130 400 148 L400 210 L0 210Z"
+                          fill="color-mix(in srgb,var(--ink) 8%,transparent)"/>
+                    <path d="M0 52 H400 M0 104 H400 M0 156 H400 M80 0 V210 M160 0 V210 M240 0 V210 M320 0 V210"
+                          stroke="var(--rule)" stroke-width=".8"/>
+                  </svg>
+                  <div class="ctrl"><b>+</b><b>&minus;</b></div>
+                  <div class="pin" style="left:50%;top:62%">
+                    <svg viewBox="0 0 18 26"><path d="M9 0C4 0 0 4 0 9c0 7 9 17 9 17s9-10 9-17c0-5-4-9-9-9z"
+                         fill="var(--accent)"/><circle cx="9" cy="9" r="3.4" fill="#fff"/></svg>
+                  </div>
+                  <div class="attr">&copy; OpenStreetMap</div>
+                </div>
+                <span class="chip">45.6495, 13.7768</span>
+              </div></div>
+            <div class="row"><div class="k">Updated</div>
+              <div class="v">2 hours ago</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="band reveal">
+    <div class="mx">
+      <p class="eyebrow">01 &nbsp;/&nbsp; The smallest real thing</p>
+      <h2>Two arguments. That is the whole field.</h2>
+      <p class="lede">
+        No <code>type()</code>, no handing the data in yourself. Name the field, name the column,
+        and the resolver chain works out what it found.
+      </p>
+      <div class="demo">
+        <div class="code">
+          <div class="cap"><i></i>app/Nova/Warehouse.php</div>
+<pre><span class="k">use</span> <span class="s">Gabrielesbaiz\NovaFieldMap\FieldMap</span>;
+
+<span class="k">public function</span> <span class="f">fields</span>(NovaRequest $request): <span class="k">array</span>
+{
+    <span class="k">return</span> [
+        FieldMap::<span class="f">make</span>(<span class="s">'Location'</span>, <span class="s">'coordinates'</span>),
+    ];
+}</pre>
+        </div>
+        <div class="result">
+          <div class="cap">What renders</div>
+          <div class="pad">
+            <div class="mock">
+              <svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <rect width="400" height="200" fill="color-mix(in srgb,var(--accent) 5%,var(--wash))"/>
+                <path d="M0 150 C 60 140 100 160 150 148 S 250 124 400 140 L400 200 L0 200Z"
+                      fill="color-mix(in srgb,var(--ink) 8%,transparent)"/>
+                <path d="M0 96 H400 M0 48 H400 M0 144 H400 M80 0 V200 M160 0 V200 M240 0 V200 M320 0 V200"
+                      stroke="var(--rule)" stroke-width=".8"/>
+              </svg>
+              <div class="ctrl"><b>+</b><b>&minus;</b></div>
+              <div class="pin" style="left:50%;top:58%">
+                <svg viewBox="0 0 18 26"><path d="M9 0C4 0 0 4 0 9c0 7 9 17 9 17s9-10 9-17c0-5-4-9-9-9z"
+                     fill="var(--accent)"/><circle cx="9" cy="9" r="3.4" fill="#fff"/></svg>
+              </div>
+              <div class="attr">&copy; OpenStreetMap</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="lede" style="margin-top:2rem">
+        The <code>coordinates</code> column can hold any of these. Nothing tells the field which:
+      </p>
+      <div class="shapes">
+        <div><code>'45.6495,13.7768'</code><span>a string</span></div>
+        <div><code>[45.6495, 13.7768]</code><span>a positional array</span></div>
+        <div><code>['lat' =&gt; 45.6495, 'lng' =&gt; 13.7768]</code><span>a keyed array</span></div>
+        <div><code>'{"type":"Point","coordinates":[13.7768,45.6495]}'</code><span>GeoJSON</span></div>
+        <div><code>new Point(45.6495, 13.7768)</code><span>a spatial value object</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band reveal">
+    <div class="mx">
+      <p class="eyebrow">02 &nbsp;/&nbsp; Editable</p>
+      <h2>Two more calls and an administrator places the pin.</h2>
+      <p class="lede">
+        2.x forced <code>showOnUpdate</code> to false and shipped a text input that did nothing.
+        3.0 gives you a real form field: click to place, drag to adjust, search for a place, or
+        type the numbers.
+      </p>
+      <div class="demo">
+        <div class="code">
+          <div class="cap"><i></i>Editable, with place search</div>
+<pre>FieldMap::<span class="f">make</span>(<span class="s">'Location'</span>, <span class="s">'coordinates'</span>)
+    -&gt;<span class="f">editable</span>()
+    -&gt;<span class="f">geocoder</span>()
+    -&gt;<span class="f">height</span>(<span class="s">'400px'</span>)</pre>
+        </div>
+        <div class="result">
+          <div class="cap">What renders</div>
+          <div class="pad">
+            <div class="mock">
+              <svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <rect width="400" height="200" fill="color-mix(in srgb,var(--accent) 5%,var(--wash))"/>
+                <path d="M0 150 C 60 140 100 160 150 148 S 250 124 400 140 L400 200 L0 200Z"
+                      fill="color-mix(in srgb,var(--ink) 8%,transparent)"/>
+                <path d="M0 96 H400 M0 48 H400 M0 144 H400 M80 0 V200 M160 0 V200 M240 0 V200 M320 0 V200"
+                      stroke="var(--rule)" stroke-width=".8"/>
+              </svg>
+              <div class="search">&#9906; &nbsp;Search for a place</div>
+              <div class="ctrl"><b>+</b><b>&minus;</b></div>
+              <div class="pin" style="left:46%;top:66%">
+                <svg viewBox="0 0 18 26"><path d="M9 0C4 0 0 4 0 9c0 7 9 17 9 17s9-10 9-17c0-5-4-9-9-9z"
+                     fill="var(--accent)"/><circle cx="9" cy="9" r="3.4" fill="#fff"/></svg>
+              </div>
+              <div class="attr">&copy; OpenStreetMap</div>
+            </div>
+            <div class="fieldrow">
+              <div><label>Latitude</label><input value="45.649500" readonly></div>
+              <div><label>Longitude</label><input value="13.776800" readonly></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band reveal">
+    <div class="mx">
+      <p class="eyebrow">03 &nbsp;/&nbsp; A whole relation</p>
+      <h2>One marker per related record, clustered, clickable.</h2>
+      <p class="lede">
+        Each related record's attributes travel with its feature, so popups and per-marker styling
+        address them by column name. <code>linkToResource()</code> makes a marker click open that
+        record's detail page through Inertia.
+      </p>
+      <div class="demo">
+        <div class="code">
+          <div class="cap"><i></i>A store locator</div>
+<pre><span class="k">public static</span> $with = [<span class="s">'branches'</span>];
+
+FieldMap::<span class="f">make</span>(<span class="s">'Branches'</span>, <span class="s">'coordinates'</span>)
+    -&gt;<span class="f">relation</span>(<span class="s">'branches'</span>)
+    -&gt;<span class="f">popup</span>(<span class="s">'name'</span>)
+    -&gt;<span class="f">linkToResource</span>()
+    -&gt;<span class="f">cluster</span>(disableAtZoom: <span class="k">12</span>)
+
+<span class="c">// popup('name') is escaped. Markup needs</span>
+<span class="c">// an explicit ->allowHtmlPopups().</span></pre>
+        </div>
+        <div class="result">
+          <div class="cap">What renders</div>
+          <div class="pad">
+            <div class="mock">
+              <svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <rect width="400" height="200" fill="color-mix(in srgb,var(--accent) 5%,var(--wash))"/>
+                <path d="M0 150 C 60 140 100 160 150 148 S 250 124 400 140 L400 200 L0 200Z"
+                      fill="color-mix(in srgb,var(--ink) 8%,transparent)"/>
+                <path d="M0 96 H400 M0 48 H400 M0 144 H400 M80 0 V200 M160 0 V200 M240 0 V200 M320 0 V200"
+                      stroke="var(--rule)" stroke-width=".8"/>
+              </svg>
+              <div class="ctrl"><b>+</b><b>&minus;</b></div>
+              <div class="cluster" style="left:30%;top:52%">14</div>
+              <div class="cluster" style="left:68%;top:40%;width:1.65rem;height:1.65rem;font-size:.6rem">6</div>
+              <div class="bubble" style="left:50%;top:70%">Porto Vecchio</div>
+              <div class="pin" style="left:50%;top:72%">
+                <svg viewBox="0 0 18 26"><path d="M9 0C4 0 0 4 0 9c0 7 9 17 9 17s9-10 9-17c0-5-4-9-9-9z"
+                     fill="var(--accent)"/><circle cx="9" cy="9" r="3.4" fill="#fff"/></svg>
+              </div>
+              <div class="attr">&copy; OpenStreetMap</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band reveal">
+    <div class="mx">
+      <p class="eyebrow">04 &nbsp;/&nbsp; Decide by driving it</p>
+      <h2>Every method, every option, live.</h2>
+      <p class="lede">
+        The playground has a control for all 58 public methods. Change one and three things move at
+        once: the chain you would paste into a resource, the field Nova would draw, and the payload
+        the browser actually receives — generated by the same rules as <code>mapMeta()</code>, so the
+        derived values behave exactly as they do in your app.
+      </p>
+      <div class="three">
+        <div class="c"><div class="n">Preview</div><h3>What Nova draws</h3>
+          <p>Markers, clusters, heat, choropleth, the draw toolbar, the search box, the legend, the
+             index column. Turn a thing on and it appears.</p></div>
+        <div class="c"><div class="n">PHP</div><h3>The chain to paste</h3>
+          <p>Only the calls that differ from a default are emitted, with the right
+             <code>use</code> statements, so what you copy is what you would have written.</p></div>
+        <div class="c"><div class="n">Payload</div><h3>All sixty variables</h3>
+          <p>The meta array the component receives, with the computed keys flagged — clustering
+             forced off, the canvas threshold, a keyless tile being dropped.</p></div>
+      </div>
+      <div class="cta" style="margin-top:1.6rem">
+        <a class="btn" href="#/play">Open the playground</a>
+        <a class="btn ghost" href="#/api">Browse all 58 methods</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="band reveal">
+    <div class="mx">
+      <p class="eyebrow">05 &nbsp;/&nbsp; What changed in 3.0</p>
+      <h2>A rewrite, driven by three things that were wrong.</h2>
+      <div class="three">
+        <div class="c"><div class="n">01</div><h3>Popups were an XSS hole</h3>
+          <p>Leaflet's <code>bindPopup()</code> renders a string as HTML, and 2.x passed feature
+             properties to it untouched. Anyone who could write that column could run JavaScript in
+             an administrator's session. Content is now escaped in PHP; markup needs an explicit
+             opt-in and is still sanitised in the browser.</p></div>
+        <div class="c"><div class="n">02</div><h3>It leaked on every navigation</h3>
+          <p>The map was never removed on unmount, so each Inertia page change left a live Leaflet
+             instance and its handlers on detached DOM. 3.0 calls <code>map.remove()</code> and
+             disconnects both observers — and a test asserts it.</p></div>
+        <div class="c"><div class="n">03</div><h3>Every page paid for Leaflet</h3>
+          <p>2.x shipped one 74.3&nbsp;kB gzipped bundle on every Nova page, map or no map. The entry
+             bundle is now 11.2&nbsp;kB; Leaflet arrives only when a map is about to become visible.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band reveal">
+    <div class="mx">
+      <p class="eyebrow">06 &nbsp;/&nbsp; When not to use this</p>
+      <h2>If two number fields will do, use two number fields.</h2>
+      <p class="lede">
+        Showing a latitude and a longitude is not a reason to load a mapping library. Two
+        <code>Number</code> fields are less JavaScript, less to go wrong, and an administrator who
+        knows the coordinates can simply type them.
+      </p>
+      <div class="vs">
+        <div class="side">
+          <h3>Use Nova's own fields when&hellip;</h3>
+<pre>Number::<span class="f">make</span>(<span class="s">'Latitude'</span>)-&gt;<span class="f">step</span>(<span class="k">0.000001</span>),
+Number::<span class="f">make</span>(<span class="s">'Longitude'</span>)-&gt;<span class="f">step</span>(<span class="k">0.000001</span>),</pre>
+          <ul>
+            <li>The coordinates are data, not a place anyone needs to see.</li>
+            <li>Nobody is verifying the location by looking at it.</li>
+            <li>Your index tables need a location column and nothing more.</li>
+          </ul>
+        </div>
+        <div class="side win">
+          <h3>Use FieldMap when&hellip;</h3>
+<pre>FieldMap::<span class="f">make</span>(<span class="s">'Location'</span>, <span class="s">'coordinates'</span>)
+    -&gt;<span class="f">editable</span>()
+    -&gt;<span class="f">geocoder</span>(),</pre>
+          <ul>
+            <li>Somebody has to confirm the warehouse is on the right side of the motorway.</li>
+            <li>Fifty branches need to be seen at once, and the gap noticed.</li>
+            <li>The person knows where the site is, but not its coordinates.</li>
+            <li>A delivery-zone polygon has to be checked against the estate.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="support reveal">
+    <div class="mx">
+      <p class="eyebrow">Support this package</p>
+      <h2>Free forever. Not free to <em class="mark">maintain</em>.</h2>
+      <div class="top-grid">
+        <div>
+          <p class="body">
+            The work you never see is the work that keeps the map boring. Tile hosts change their URL
+            templates. Leaflet ships a minor. Nova ships a major and the field payload shape moves
+            under you. Somebody has to notice, upgrade, and re-run 169 tests before your admin panel
+            renders a grey box on a Monday morning. It stays MIT either way.
+          </p>
+          <p class="body">
+            Sponsoring buys that time — the compatibility passes, the issue triage, the day spent
+            working out why one tile provider started rate-limiting. It does not buy features,
+            because no feature is held back. It stays MIT either way.
+          </p>
+        </div>
+        <div class="sponsor-card">
+          <div class="price">$5</div>
+          <div class="terms">per month &nbsp;·&nbsp; cancel anytime</div>
+          <a class="btn" href="https://github.com/sponsors/gabrielesbaiz">&#9829; Become a sponsor</a>
+          <p class="fine">Company tiers get your logo in the README and on this page.</p>
+        </div>
+      </div>
+      <div class="ways">
+        <div class="w"><span class="tag">FREE</span><div class="ic">&#11088;</div>
+          <h3>Star the repo</h3>
+          <p>Thirty seconds, and it is the first signal another Laravel developer looks at.</p></div>
+        <div class="w"><span class="tag">FREE</span><div class="ic">&#128027;</div>
+          <h3>Open a good issue</h3>
+          <p>A resource class, the column's contents and the browser console beat a screenshot every time.</p></div>
+        <div class="w"><div class="ic">&#10084;&#65039;</div>
+          <h3>Sponsor from $5</h3>
+          <p>Recurring, cancellable, and it is what keeps this green across Nova majors.</p></div>
+        <div class="w"><div class="ic">&#127970;</div>
+          <h3>Company tier</h3>
+          <p>If your team ships this to clients, a company tier puts your logo here.</p></div>
+      </div>
+      <p class="why">
+        <b>Why ask at all?</b> This package is MIT and always will be. Nothing is paywalled, nothing
+        phones home, and no <em>map feature</em> is held back for sponsors. Sponsorship buys
+        maintenance time, not features — and if you cannot sponsor, the star and the bug report
+        genuinely help.
+      </p>
+    </div>
+  </section>
+</div>
+
+<!-- ==================== DOCS PAGES ==================== -->
+<div class="page hidden" id="docs">
+  <div class="mx docs">
+    <aside class="sidenav" aria-label="Documentation">
+      <div class="group"><h4>Getting started</h4><ul>
+        <li><a href="#/intro">Introduction</a></li>
+        <li><a href="#/install">Installation</a></li>
+        <li><a href="#/configuration">Configuration</a></li>
+      </ul></div>
+      <div class="group"><h4>Usage</h4><ul>
+        <li><a href="#/guide">Guide</a></li>
+        <li><a href="#/play">Playground</a></li>
+        <li><a href="#/recipes">Recipes</a></li>
+        <li><a href="#/commands">Commands</a></li>
+      </ul></div>
+      <div class="group"><h4>Reference</h4><ul>
+        <li><a href="#/api">API reference</a></li>
+        <li><a href="#/tiles">Tile providers</a></li>
+        <li><a href="#/troubleshooting">Troubleshooting</a></li>
+      </ul></div>
+      <div class="group"><h4>Project</h4><ul>
+        <li><a href="#/security">Security</a></li>
+        <li><a href="#/upgrade">Upgrading</a></li>
+        <li><a href="#/changelog">Changelog</a></li>
+        <li><a href="https://github.com/sponsors/gabrielesbaiz">Sponsor</a></li>
+      </ul></div>
+    </aside>
+
+    <div class="body" id="docBody"><!-- filled by the router --></div>
+
+    <aside class="onthispage" aria-label="On this page">
+      <h4>On this page</h4>
+      <ol id="toc"></ol>
+    </aside>
+  </div>
+</div>
+
+</main>
+
+<footer class="sitefoot">
+  <div class="mx">
+    <div class="cols">
+      <div><h4>Package</h4><ul>
+        <li><a href="https://github.com/gabrielesbaiz/nova-field-map">GitHub</a></li>
+        <li><a href="https://packagist.org/packages/gabrielesbaiz/nova-field-map">Packagist</a></li>
+        <li><a href="#/changelog">Changelog</a></li>
+      </ul></div>
+      <div><h4>Documentation</h4><ul>
+        <li><a href="#/intro">Introduction</a></li>
+        <li><a href="#/install">Installation</a></li>
+        <li><a href="#/configuration">Configuration</a></li>
+        <li><a href="#/play">Playground</a></li>
+      </ul></div>
+      <div><h4>Reference</h4><ul>
+        <li><a href="#/api">API reference</a></li>
+        <li><a href="#/tiles">Tile providers</a></li>
+        <li><a href="#/upgrade">Upgrading from 2.x</a></li>
+      </ul></div>
+      <div><h4>Project</h4><ul>
+        <li><a href="#/security">Security policy</a></li>
+        <li><a href="#/troubleshooting">Troubleshooting</a></li>
+        <li><a href="https://github.com/sponsors/gabrielesbaiz">Sponsor</a></li>
+      </ul></div>
+    </div>
+    <div class="base">
+      <span>MIT licensed &nbsp;·&nbsp; Built by Gabriele Sbaiz</span>
+      <span>Requires a Laravel Nova licence, sold separately</span>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

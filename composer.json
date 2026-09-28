@@ -1,10 +1,14 @@
 {
     "name": "gabrielesbaiz/nova-field-map",
-    "description": "Custom Laravel Nova 4 map detail field",
+    "description": "Leaflet map field for Laravel Nova 5 with GeoJSON, editable markers, drawing, clustering and dark mode.",
     "keywords": [
         "Gabriele Sbaiz",
         "laravel",
-        "nova-field-map"
+        "nova",
+        "nova-field-map",
+        "leaflet",
+        "map",
+        "geojson"
     ],
     "homepage": "https://github.com/gabrielesbaiz/nova-field-map",
     "license": "MIT",
@@ -16,30 +20,30 @@
         }
     ],
     "require": {
-        "php": "^8.0",
-        "spatie/laravel-package-tools": "^1.16",
-        "illuminate/support": "^10.0|^11.0|^12.0"
+        "php": "^8.2",
+        "illuminate/support": "^11.0|^12.0|^13.0",
+        "laravel/nova": "^5.0"
     },
     "require-dev": {
-        "laravel/nova": "^5.0",
+        "larastan/larastan": "^3.0",
         "laravel/nova-devtool": "^1.7",
         "laravel/pint": "^1.14",
-        "nunomaduro/collision": "^8.1.1||^7.10.0",
-        "orchestra/testbench": "^10.0.0||^9.0.0||^8.22.0",
-        "pestphp/pest": "^3.0",
-        "pestphp/pest-plugin-arch": "^3.0",
-        "pestphp/pest-plugin-laravel": "^3.0"
+        "nunomaduro/collision": "^8.1.1",
+        "orchestra/testbench": "^9.0|^10.0|^11.0",
+        "pestphp/pest": "^3.0|^4.0",
+        "pestphp/pest-plugin-arch": "^3.0|^4.0",
+        "pestphp/pest-plugin-laravel": "^3.0|^4.0"
     },
     "autoload": {
         "psr-4": {
-            "Gabrielesbaiz\\NovaFieldMap\\": "src/",
-            "Gabrielesbaiz\\NovaFieldMap\\Database\\Factories\\": "database/factories/"
+            "Gabrielesbaiz\\NovaFieldMap\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
             "Gabrielesbaiz\\NovaFieldMap\\Tests\\": "tests/",
-            "Workbench\\App\\": "workbench/app/"
+            "Workbench\\App\\": "workbench/app/",
+            "Workbench\\Database\\Factories\\": "workbench/database/factories/"
         }
     },
     "scripts": {
@@ -60,16 +64,16 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Gabrielesbaiz\\NovaFieldMap\\NovaFieldMapServiceProvider"
+                "Gabrielesbaiz\\NovaFieldMap\\FieldMapServiceProvider"
             ]
         }
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "repositories": [
-        {
+    "repositories": {
+        "nova": {
             "type": "composer",
             "url": "https://nova.laravel.com"
         }
-    ]
+    }
 }

@@ -1,1 +1,81 @@
-/* Nova Field CSS */
+/*
+ * Leaflet's stylesheets are bundled here rather than loaded with the lazy
+ * chunks: they are small, and Nova::style serves exactly one file.
+ */
+@import "leaflet/dist/leaflet.css";
+@import "leaflet.markercluster/dist/MarkerCluster.css";
+@import "leaflet.markercluster/dist/MarkerCluster.Default.css";
+@import "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css";
+
+/*
+ * Leaflet renders above Nova's dropdowns and modals unless its stacking
+ * context is pinned back down.
+ */
+.nova-field-map .leaflet-container {
+    z-index: 0;
+    font: inherit;
+    background-color: transparent;
+}
+
+.nova-field-map .leaflet-popup-content-wrapper,
+.nova-field-map .leaflet-popup-tip {
+    border-radius: 0.375rem;
+}
+
+/*
+ * Dark mode. Providers with a dark basemap are swapped at runtime; these
+ * rules cover the controls, which Leaflet paints white regardless.
+ */
+.dark .leaflet-bar a,
+.dark .leaflet-control-layers,
+.dark .leaflet-popup-content-wrapper,
+.dark .leaflet-popup-tip,
+.dark .leaflet-control-attribution {
+    background-color: #1f2937;
+    color: #e5e7eb;
+}
+
+.dark .leaflet-bar a {
+    border-bottom-color: #374151;
+}
+
+.dark .leaflet-bar a:hover {
+    background-color: #374151;
+}
+
+.dark .leaflet-control-attribution a {
+    color: #93c5fd;
+}
+
+/*
+ * A map that uses a light basemap inside a dark theme is harsh; dimming the
+ * tiles keeps it readable without pretending to be a dark style.
+ */
+.dark .nova-field-map .leaflet-tile-pane {
+    filter: brightness(0.85) saturate(0.9);
+}
+
+.dark .nova-field-map .leaflet-tile-pane:has(.leaflet-tile[src*="dark"]) {
+    filter: none;
+}
+
+@media print {
+    .nova-field-map .leaflet-control-container {
+        display: none;
+    }
+}
+
+/* Cluster bubbles coloured by clusterColorBy(). */
+.nova-field-map__cluster span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 9999px;
+    background-color: var(--cluster-color, #2563eb);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    box-shadow: 0 0 0 4px rgb(255 255 255 / 0.4);
+}
